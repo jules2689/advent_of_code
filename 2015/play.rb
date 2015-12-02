@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-Dir[File.dirname(__FILE__) + '/2015/challenges/*.rb'].each {|file| require file }
+Dir[File.dirname(__FILE__) + '/challenges/*.rb'].each {|file| require file }
 
 classes = Advent.constants.select {|c| Advent.const_get(c).is_a? Class}
 restriction = ARGV[0]
