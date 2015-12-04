@@ -15,3 +15,4 @@ To Run
 ===
 1. run `./2015/play.rb`
 2. To restrict to a day, add `Day#` where # is the day to which you would like to restrict the answer.
+3. To run tests add `test` (e.g. `./2015/play.rb test`). You can also restrict to a day (e.g. `./2015/play.rb Day1 test`)
