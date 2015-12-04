@@ -28,15 +28,31 @@ module Advent
       direct_santas([Santa.new, Santa.new])
     end
 
-    def direct_santas(santas)
+    def direct_santas(santas, santa_directions=input)
       houses = { "0-0" => santas.size }
-      input.split("").each_with_index do |direction, index|
+      santa_directions.split("").each_with_index do |direction, index|
         santa = santas[index % santas.length]
         santa.process_direction(direction)
         key = "#{santa.x}-#{santa.y}"
         houses[key] = (houses[key] || 0) + 1
       end
       houses.count
+    end
+
+    # Testing
+
+    def test
+      test_1 = perform_test(1, ">", 2) && perform_test(1, "^>v<", 4) && perform_test(1, "^v^v^v^v^v", 2)
+      test_2 = perform_test(2, "^v", 3) && perform_test(2, "^>v<", 3) && perform_test(2, "^v^v^v^v^v", 11)
+      test_1 && test_2
+    end
+
+    def perform_test(test, test_input, answer)
+      santas = test == 1 ? [Santa.new] : [Santa.new, Santa.new]
+      result = direct_santas(santas, test_input)
+      passed = result.to_i == answer
+      puts "Expecting #{answer} for input #{test_input}. Got #{result}."
+      passed
     end
   end
 end

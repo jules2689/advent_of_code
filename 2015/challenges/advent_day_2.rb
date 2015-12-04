@@ -44,5 +44,20 @@ module Advent
     def dimensions(dimension)
       dimension.split("x").map(&:to_i)
     end
+
+    # Testing
+
+    def test
+      test_1 = perform_test(1, "2x3x4", 58) && perform_test(1, "1x1x10", 43)
+      test_2 = perform_test(2, "2x3x4", 34) && perform_test(2, "1x1x10", 14)
+      test_1 && test_2
+    end
+
+    def perform_test(test, test_input, answer)
+      result = test == 1 ? sq_ft(*dimensions(test_input)) : length_of_ribbon(*dimensions(test_input))
+      passed = result.to_i == answer
+      puts "Expecting #{answer} for input #{test_input}. Got #{result}."
+      passed
+    end
   end
 end
