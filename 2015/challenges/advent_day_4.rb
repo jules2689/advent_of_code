@@ -12,20 +12,20 @@
 require 'digest/md5'
 
 module Advent
-  class Day4
+  class Day4 < Base
     def input
       "bgvyzdsv"
     end
 
-    def challenge_1
-      search_for_start_token("00000")
+    def challenge_1(challenge_input=input)
+      search_for_start_token("00000", challenge_input)
     end
 
-    def challenge_2
-      search_for_start_token("000000")
+    def challenge_2(challenge_input=input)
+      search_for_start_token("000000", challenge_input)
     end
 
-    def search_for_start_token(search_key, key=input)
+    def search_for_start_token(search_key, key)
       answer = -1
       result = ""
 
@@ -40,14 +40,7 @@ module Advent
     # Testing
 
     def test
-      perform_test("abcdef", 609043) && perform_test("pqrstuv", 1048970)
-    end
-
-    def perform_test(secret_key, answer)
-      result = search_for_start_token("00000", secret_key)
-      passed = result.to_i == answer
-      puts "Expecting #{answer} for input #{secret_key}. Got #{result}."
-      passed
+      perform_test(1, "abcdef", 609043) && perform_test(1, "pqrstuv", 1048970)
     end
   end
 end

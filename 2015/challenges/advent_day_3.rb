@@ -51,7 +51,7 @@ module Advent
       santas = test == 1 ? [Santa.new] : [Santa.new, Santa.new]
       result = direct_santas(santas, test_input)
       passed = result.to_i == answer
-      puts "Expecting #{answer} for input #{test_input}. Got #{result}."
+      puts format_test_string("Expecting #{answer} for input #{test_input}. Got #{result}.", passed)
       passed
     end
   end
