@@ -58,18 +58,14 @@ module Advent
 
     def challenge_1(challenge_input=input)
       circuit = base_circuit(challenge_input)
-      circuit.calculate
       circuit.get_values["a"]
     end
 
     def challenge_2(challenge_input=input)
-      circuit = base_circuit(challenge_input)
-      circuit.calculate
-      a = circuit.get_values["a"]
+      a = challenge_1(challenge_input)
 
       circuit2 = base_circuit(challenge_input)
       circuit2.add_instruction("#{a} -> b")
-      circuit2.calculate
       circuit2.get_values["a"]
     end
 
@@ -96,11 +92,7 @@ module Advent
     end
 
     def perform_test(test, test_input, answer)
-      circuit = base_circuit(test_input)
-      circuit.calculate
-
-      result = circuit.get_values
-      result = result.to_i if result.respond_to?(:to_i)
+      result = base_circuit(test_input).get_values
       passed =  result == answer
       puts format_test_string("Test #{test} => Expecting #{answer} for input #{test_input}. Got #{result}.", passed)
       passed
