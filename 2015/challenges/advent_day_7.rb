@@ -39,10 +39,15 @@
 # i: 65079
 # x: 123
 # y: 456
-# In little Bobby's kit's instructions booklet (provided as your puzzle input), what signal is ultimately provided to wire a?
+
+# In little Bobby's kit's instructions booklet (provided as your puzzle input), 
+# what signal is ultimately provided to wire a?
+
+# --- Part Two ---
+# Now, take the signal you got on wire a, override wire b to that signal, and reset the 
+# other wires (including wire a). What new signal is ultimately provided to wire a?
 
 require_relative "helpers/circuit.rb"
-require 'pry'
 
 module Advent
   class Day7 < Base
@@ -93,7 +98,7 @@ module Advent
     def perform_test(test, test_input, answer)
       circuit = base_circuit(test_input)
       circuit.calculate
-      
+
       result = circuit.get_values
       result = result.to_i if result.respond_to?(:to_i)
       passed =  result == answer
