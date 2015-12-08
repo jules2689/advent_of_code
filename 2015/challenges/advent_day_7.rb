@@ -42,6 +42,7 @@
 # In little Bobby's kit's instructions booklet (provided as your puzzle input), what signal is ultimately provided to wire a?
 
 require_relative "helpers/circuit.rb"
+require 'pry'
 
 module Advent
   class Day7 < Base
@@ -51,17 +52,28 @@ module Advent
     end
 
     def challenge_1(challenge_input=input)
-      c = Circuit.new
-
-      challenge_input.each do |instruction|
-        c.add_instruction(instruction)
-      end
-
-      c.calculate
-      c.get_values
+      circuit = base_circuit(challenge_input)
+      circuit.calculate
+      circuit.get_values["a"]
     end
 
     def challenge_2(challenge_input=input)
+      circuit = base_circuit(challenge_input)
+      circuit.calculate
+      a = circuit.get_values["a"]
+
+      circuit2 = base_circuit(challenge_input)
+      circuit2.add_instruction("#{a} -> b")
+      circuit2.calculate
+      circuit2.get_values["a"]
+    end
+
+    def base_circuit(challenge_input=input)
+      c = Circuit.new
+      challenge_input.each do |instruction|
+        c.add_instruction(instruction)
+      end
+      c
     end
 
     # Testing
@@ -69,13 +81,24 @@ module Advent
     def test
       test_1_expected = { "d" => 72, "e" => 507, "f" => 492, "g" => 114, "h" => 65412, "i" => 65079, "x" => 123, "y" => 456 }
       
-      perform_test(1, ["all", "123 -> x"], { "x" => 123 }) && perform_test(1, ["all", "456 -> y"], { "y" => 456 }) &&
-      perform_test(1, ["all", "456 -> y", "NOT y -> x"], { "y" => 456, "x" => 65079 }) && 
-      perform_test(1, ["all", "123 -> y", "5 AND y -> x"], { "y" => 123, "x" => 1 }) &&
-      perform_test(1, ["all", "123 -> y", "5 OR y -> x"], { "y" => 123, "x" => 127 }) &&
-      perform_test(1, ["all", "1 -> y", "5 LSHIFT y -> x"], { "y" => 1, "x" => 10 }) &&
-      perform_test(1, ["all", "1 -> y", "5 RSHIFT y -> x"], { "y" => 1, "x" => 2 }) &&
-      perform_test(1, ["all", "123 -> x", "456 -> y", "x AND y -> d", "x OR y -> e", "x LSHIFT 2 -> f", "y RSHIFT 2 -> g", "NOT x -> h", "NOT y -> i"], test_1_expected)
+      perform_test(1, ["123 -> x"], { "x" => 123 }) && perform_test(1, ["456 -> y"], { "y" => 456 }) &&
+      perform_test(1, ["456 -> y", "NOT y -> x"], { "y" => 456, "x" => 65079 }) && 
+      perform_test(1, ["123 -> y", "5 AND y -> x"], { "y" => 123, "x" => 1 }) &&
+      perform_test(1, ["123 -> y", "5 OR y -> x"], { "y" => 123, "x" => 127 }) &&
+      perform_test(1, ["1 -> y", "5 LSHIFT y -> x"], { "y" => 1, "x" => 10 }) &&
+      perform_test(1, ["1 -> y", "5 RSHIFT y -> x"], { "y" => 1, "x" => 2 }) &&
+      perform_test(1, ["123 -> x", "456 -> y", "x AND y -> d", "x OR y -> e", "x LSHIFT 2 -> f", "y RSHIFT 2 -> g", "NOT x -> h", "NOT y -> i"], test_1_expected)
+    end
+
+    def perform_test(test, test_input, answer)
+      circuit = base_circuit(test_input)
+      circuit.calculate
+      
+      result = circuit.get_values
+      result = result.to_i if result.respond_to?(:to_i)
+      passed =  result == answer
+      puts format_test_string("Test #{test} => Expecting #{answer} for input #{test_input}. Got #{result}.", passed)
+      passed
     end
   end
 end

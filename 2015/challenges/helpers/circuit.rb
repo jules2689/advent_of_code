@@ -1,55 +1,33 @@
 class Circuit
-
-  attr_accessor :variables, :instructions, :leftovers
+  attr_accessor :variables, :instructions
 
   def initialize
     self.variables = []
     self.instructions = {}
-    self.leftovers = {}
   end
 
   def add_instruction(instruction)
     var = instruction.split(" -> ").last
     func = instruction.split(" -> ").first
-    self.instructions["#{var}_#{func.downcase.gsub(/\s/,'_')}"] = func
+    self.instructions[var] = func
   end
 
   def calculate
     self.instructions = self.instructions.sort.to_h
 
     self.instructions.each do |var, instruction|
-      idx = var.index('_') - 1
-      var = var[0..idx]
-
+      self.variables << var
       if is_var_assignment?(instruction)
-        self.variables << var unless self.variables.include?(var)
-        if is_integer?(instruction)
-          set(var, instruction)
-        else
-          self.leftovers[var] = instruction
-        end
-      end
-    end
-
-    self.instructions.each do |var, instruction|
-      idx = var.index('_') - 1
-      var = var[0..idx]
-
-      if !is_var_assignment?(instruction)
-        self.variables << var unless self.variables.include?(var)
+        assign_var(instruction, var)
+      else
         route_var_instruction(instruction, var)
       end
     end
-
-    self.leftovers.each do |var, instruction|
-      set(var, get(instruction))
-    end
-
   end
 
   def get_values
     hash = {}
-    self.variables.each do |var|
+    self.variables.uniq.sort.each do |var|
       hash[var] = get(var)
     end
     hash.sort.to_h
@@ -57,20 +35,23 @@ class Circuit
 
   private
 
-  def set(var, val)
-    puts "Assigning #{val} to #{var}"
-    instance_variable_set("@#{var}", val)
-  end
+  ##########
+  # HELPERS
+  ##########
 
   def get(var)
     if is_integer?(var)
-      v = var.to_i
+      value = var.to_i
     else
-      v = instance_variable_get("@#{var}").to_i
+      # Check if we've cached the value, fetch if we haven't then cache
+      unless value = instance_variable_get("@#{var}")
+        value = self.send(var).to_i
+        instance_variable_set("@#{var}", value)
+      end
     end
 
-    v += 0x1_0000 if v < 0
-    v
+    value += 0x1_0000 if value < 0 # force 16 bit signed
+    value
   end
 
   def is_integer?(val)
@@ -79,6 +60,28 @@ class Circuit
 
   def is_var_assignment?(func)
     %w( AND OR LSHIFT RSHIFT NOT ).all? { |f| !func.include?(f) }
+  end
+
+  def define_method(name, &block)
+    self.class.send(:define_method, name, &block)
+  end
+
+  def remove_method(name)
+    self.class.send(:remove_method, name)
+  end
+
+  #####################################
+  # VAR ASSIGNMENT AND DYNAMIC METHODS
+  #####################################
+
+  def assign_var(instruction, var)
+    define_method var do
+      if is_integer?(instruction)
+        instruction
+      else
+        get(instruction)
+      end
+    end
   end
 
   def route_var_instruction(instruction, var)
@@ -90,38 +93,49 @@ class Circuit
   def add_and_instruction(instruction, var)
     first_var = instruction.split(" AND ").first
     second_var = instruction.split(" AND ").last
-    puts "AND:: #{var} = #{first_var} and #{second_var}"
-    instance_variable_set("@#{var}", get(first_var) & get(second_var))
+
+    define_method var do
+      get(first_var) & get(second_var)
+    end
   end
 
   # x OR y -> e
   def add_or_instruction(instruction, var)
     first_var = instruction.split(" OR ").first
     second_var = instruction.split(" OR ").last
-    puts "OR:: #{var} = #{first_var} or #{second_var}"
-    instance_variable_set("@#{var}", get(first_var) | get(second_var))
+    
+    define_method var do
+      get(first_var) | get(second_var)
+    end
   end
   
   # NOT y -> i
   def add_not_instruction(instruction, var)
     first_var = instruction.split("NOT ").last
-    puts "NOT:: #{var} = !#{first_var}"
-    instance_variable_set("@#{var}", ~get(first_var))
+
+    define_method var do
+      ~get(first_var)
+    end
   end
 
   # x LSHIFT 2 -> f
   def add_lshift_instruction(instruction, var)
     first_var = instruction.split(" LSHIFT ").first
     second_var = instruction.split(" LSHIFT ").last
-    puts "LSHIFT:: #{var} = #{first_var} << #{second_var}"
-    instance_variable_set("@#{var}", get(first_var) << get(second_var))
+
+    define_method var do
+      get(first_var) << get(second_var)
+    end
   end
 
   # y RSHIFT 2 -> g
   def add_rshift_instruction(instruction, var)
     first_var = instruction.split(" RSHIFT ").first
     second_var = instruction.split(" RSHIFT ").last
-    puts "RSHIFT:: #{var} = #{first_var} >> #{second_var}"
-    instance_variable_set("@#{var}", get(first_var) >> get(second_var))
+    
+    define_method var do
+      get(first_var) >> get(second_var)
+    end
   end
+
 end
