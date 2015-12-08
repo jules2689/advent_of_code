@@ -17,8 +17,9 @@ module Advent
 
     def perform_test(test, test_input, answer)
       result = test == 1 ? challenge_1(test_input) : challenge_2(test_input)
-      passed = result.to_i == answer
-      puts format_test_string("Expecting #{answer} for input #{test_input}. Got #{result}.", passed)
+      result = result.to_i if result.respond_to?(:to_i)
+      passed =  result == answer
+      puts format_test_string("Test #{test} => Expecting #{answer} for input #{test_input}. Got #{result}.", passed)
       passed
     end
   end
