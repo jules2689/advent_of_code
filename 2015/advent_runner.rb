@@ -3,17 +3,19 @@ class AdventRunner
   def self.run_all_classes
     classes_to_run = Advent.constants.select {|c| Advent.const_get(c).is_a? Class}
     restriction = ARGV[0]
-
+    
+    classes_to_run.reject! { |a| !should_run_class?(restriction, a) }
+    classes_to_run = classes_to_run.sort { |x, y| y.to_s.gsub('Day','').to_i <=> x.to_s.gsub('Day','').to_i }
+    classes_to_run.reverse!
+    
     classes_to_run.each do |advent_class|
-      if should_run_class?(restriction, advent_class)
-        challenge = Advent::const_get(advent_class).new
-        
-        start_time = Time.now
-        output = is_testing ? run_tests(challenge) : run_challenge(challenge)
-        end_time = Time.now
+      challenge = Advent::const_get(advent_class).new
+      
+      start_time = Time.now
+      output = is_testing ? run_tests(challenge) : run_challenge(challenge)
+      end_time = Time.now
 
-        output_results(challenge, output, start_time, end_time)
-      end
+      output_results(challenge, output, start_time, end_time)
     end
   end
 

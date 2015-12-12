@@ -29,6 +29,7 @@ module Advent
     # Validators
 
     def find_next_password(challenge_input)
+      challenge_input = increment_by_one(challenge_input).map(&:chr).join("")
       while !valid?(challenge_input)
         challenge_input = increment_by_one(challenge_input).map(&:chr).join("")
       end
@@ -63,7 +64,7 @@ module Advent
     # Testing
 
     def test
-      perform_test(1, "abcdefgh", "abcdffaa")
+      perform_test(1, "abcdefgh", "abcdffaa") && perform_test(1, "ghijklmn", "ghjaabcc")
     end
   end
 end
