@@ -31,13 +31,19 @@ private
     (!ARGV[1].nil? && ARGV[1].downcase == "test") || (!ARGV[0].nil? && ARGV[0].downcase == "test")
   end
 
+  STOP_OUTPUT = true
   def self.run_tests(challenge)
-    $stdout = StringIO.new # override stdout for the tests to defer printing results
-    tests = challenge.test
-    test_passed_line = format_test_string("Test Passed: #{tests}", tests)
-    output = "#{$stdout.string}\n#{test_passed_line}"
-    $stdout = STDOUT # Put back origin STDOUT
-    output
+    if STOP_OUTPUT
+      $stdout = StringIO.new # override stdout for the tests to defer printing results
+      tests = challenge.test
+      test_passed_line = format_test_string("Test Passed: #{tests}", tests)
+      output = "#{$stdout.string}\n#{test_passed_line}"
+      $stdout = STDOUT # Put back origin STDOUT
+      output
+    else
+      tests = challenge.test
+      format_test_string("Test Passed: #{tests}", tests)
+    end
   end
 
   def self.run_challenge(challenge)
