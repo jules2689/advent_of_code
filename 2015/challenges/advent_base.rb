@@ -19,7 +19,7 @@ module Advent
       result = test == 1 ? challenge_1(test_input) : challenge_2(test_input)
       result = result.to_i if is_number?(result)
       passed =  result == answer
-      puts format_test_string("Test #{test} => Expecting #{answer} for input #{test_input}. Got #{result}.", passed)
+      puts format_test_string("Test #{test} => Expecting #{answer.inspect} for input #{test_input}. Got #{result.inspect}.", passed)
       passed
     end
 
