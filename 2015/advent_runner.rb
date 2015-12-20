@@ -31,7 +31,7 @@ private
     (!ARGV[1].nil? && ARGV[1].downcase == "test") || (!ARGV[0].nil? && ARGV[0].downcase == "test")
   end
 
-  STOP_OUTPUT = false
+  STOP_OUTPUT = true
   def self.run_tests(challenge)
     if STOP_OUTPUT
       $stdout = StringIO.new # override stdout for the tests to defer printing results
