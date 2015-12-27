@@ -7,16 +7,19 @@ class AdventRunner
     classes_to_run.reject! { |a| !should_run_class?(restriction, a) }
     classes_to_run = classes_to_run.sort { |x, y| y.to_s.gsub('Day','').to_i <=> x.to_s.gsub('Day','').to_i }
     classes_to_run.reverse!
-    
+    all_passed = true
+
     classes_to_run.each do |advent_class|
       challenge = Advent::const_get(advent_class).new
       
       start_time = Time.now
       output = is_testing ? run_tests(challenge) : run_challenge(challenge)
+      all_passed = all_passed && output.include?("Test Passed: true")
       end_time = Time.now
-
       output_results(challenge, output, start_time, end_time)
     end
+
+    puts format_test_string("=================\nAll Passed: #{all_passed}", all_passed) if is_testing
   end
 
 private
@@ -42,7 +45,6 @@ private
       output
     else
       tests = challenge.test
-      format_test_string("Test Passed: #{tests}", tests)
     end
   end
 
@@ -64,6 +66,7 @@ private
     puts class_name + class_time_separator + run_time
     puts separator
     puts output
+    puts 
   end
 
 end

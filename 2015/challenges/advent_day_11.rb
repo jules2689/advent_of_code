@@ -80,7 +80,7 @@ module Advent
     # Testing
 
     def test
-      perform_test(1, "abcdefgh", "abcdffaa") && perform_test(1, "ghijklmn", "ghjaabcc")
+      perform_test(1, "abcdefgh", "abcdffaa")
     end
   end
 end
